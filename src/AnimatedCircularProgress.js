@@ -12,7 +12,7 @@ export default class AnimatedCircularProgress extends React.PureComponent {
     };
     if(props.onFillChange){
       this.state.fillAnimation.addListener(({ value }) =>
-        props.onFillChange(value)
+          props.onFillChange(value)
       );
     }
   }
@@ -29,10 +29,10 @@ export default class AnimatedCircularProgress extends React.PureComponent {
 
   reAnimate(prefill, toVal, dur, ease) {
     this.setState(
-      {
-        fillAnimation: new Animated.Value(prefill),
-      },
-      () => this.animate(toVal, dur, ease)
+        {
+          fillAnimation: new Animated.Value(prefill),
+        },
+        () => this.animate(toVal, dur, ease)
     );
   }
 
@@ -70,11 +70,11 @@ export default class AnimatedCircularProgress extends React.PureComponent {
     const { fill, prefill, ...other } = this.props;
 
     return (
-      <AnimatedProgress
-        {...other}
-        fill={this.state.fillAnimation}
-        tintColor={this.animateColor()}
-      />
+        <AnimatedProgress
+            {...other}
+            fill={this.state.fillAnimation}
+            tintColor={this.animateColor()}
+        />
     );
   }
 }

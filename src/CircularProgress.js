@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Animated, View } from 'react-native';
-import { Svg, Path, G } from 'react-native-svg';
+import { Svg, Path, G, Defs, LinearGradient, Stop } from 'react-native-svg';
 
 export default class CircularProgress extends React.PureComponent {
   polarToCartesian(centerX, centerY, radius, angleInDegrees) {
@@ -28,8 +28,10 @@ export default class CircularProgress extends React.PureComponent {
       width,
       backgroundWidth,
       tintColor,
+      tintColorSecondary,
       tintTransparency,
       backgroundColor,
+      backgroundColorSecondary,
       style,
       rotation,
       lineCap,
@@ -41,7 +43,7 @@ export default class CircularProgress extends React.PureComponent {
       padding,
       renderCap,
       dashedBackground,
-      dashedTint
+      dashedTint,
     } = this.props;
 
     const maxWidthCircle = backgroundWidth ? Math.max(width, backgroundWidth) : width;
@@ -50,25 +52,14 @@ export default class CircularProgress extends React.PureComponent {
 
     const currentFillAngle = (arcSweepAngle * this.clampFill(fill)) / 100;
     const backgroundPath = this.circlePath(
-      sizeWithPadding,
-      sizeWithPadding,
-      radius,
-      tintTransparency ? 0 : currentFillAngle,
-      arcSweepAngle
+        sizeWithPadding,
+        sizeWithPadding,
+        radius,
+        tintTransparency ? 0 : currentFillAngle,
+        arcSweepAngle
     );
-    const circlePath = this.circlePath(
-      sizeWithPadding,
-      sizeWithPadding,
-      radius,
-      0,
-      currentFillAngle
-    );
-    const coordinate = this.polarToCartesian(
-      sizeWithPadding,
-      sizeWithPadding,
-      radius,
-      currentFillAngle
-    );
+    const circlePath = this.circlePath(sizeWithPadding, sizeWithPadding, radius, 0, currentFillAngle);
+    const coordinate = this.polarToCartesian(sizeWithPadding, sizeWithPadding, radius, currentFillAngle);
     const cap = this.props.renderCap ? this.props.renderCap({ center: coordinate }) : null;
 
     const offset = size - maxWidthCircle * 2;
@@ -86,63 +77,72 @@ export default class CircularProgress extends React.PureComponent {
         overflow: 'hidden',
       },
       ...childrenContainerStyle,
-    }
+    };
 
-    const strokeDasharrayTint = dashedTint.gap > 0 ?
-      Object.values(dashedTint)
-      .map(value => parseInt(value))
-      : null;
+    const strokeDasharrayTint = dashedTint.gap > 0 ? Object.values(dashedTint).map(value => parseInt(value)) : null;
 
-    const strokeDasharrayBackground = dashedBackground.gap > 0 ?
-      Object.values(dashedBackground)
-      .map(value => parseInt(value))
-      : null;
+    const strokeDasharrayBackground =
+        dashedBackground.gap > 0 ? Object.values(dashedBackground).map(value => parseInt(value)) : null;
 
     return (
-      <View style={style}>
-        <Svg width={size + padding} height={size + padding}>
-          <G rotation={rotation} originX={(size + padding) / 2} originY={(size + padding) / 2}>
-            {backgroundColor && (
-              <Path
-                d={backgroundPath}
-                stroke={backgroundColor}
-                strokeWidth={backgroundWidth || width}
-                strokeLinecap={lineCap}
-                strokeDasharray={strokeDasharrayBackground}
-                fill="transparent"
-              />
-            )}
-            {fill > 0 && (
-              <Path
-                d={circlePath}
-                stroke={tintColor}
-                strokeWidth={width}
-                strokeLinecap={fillLineCap}
-                strokeDasharray={strokeDasharrayTint}
-                fill="transparent"
-              />
-            )}
-            {cap}
-          </G>
-        </Svg>
-        {children && <View style={localChildrenContainerStyle}>{children(fill)}</View>}
-      </View>
+        <View style={style}>
+          <Svg width={size + padding} height={size + padding}>
+            <Defs>
+              {tintColorSecondary && (
+                  <LinearGradient id={'gradient'} x1={'0%'} y={'0%'} x2={'0%'} y2={'100%'}>
+                    <Stop offset={'0%'} stopColor={tintColor} />
+                    <Stop offset={'100%'} stopColor={tintColorSecondary} />
+                  </LinearGradient>
+              )}
+              {backgroundColorSecondary && (
+                  <LinearGradient id={'background_gradient'} x1={'0%'} y={'0%'} x2={'0%'} y2={'100%'}>
+                    <Stop offset={'0%'} stopColor={backgroundColor} />
+                    <Stop offset={'100%'} stopColor={backgroundColorSecondary} />
+                  </LinearGradient>
+              )}
+            </Defs>
+
+            <G rotation={rotation} originX={(size + padding) / 2} originY={(size + padding) / 2}>
+              {backgroundColor && (
+                  <Path
+                      d={backgroundPath}
+                      stroke={backgroundColorSecondary ? 'url(#background_gradient)' : backgroundColor}
+                      strokeWidth={backgroundWidth || width}
+                      strokeLinecap={lineCap}
+                      strokeDasharray={strokeDasharrayBackground}
+                      fill="transparent"
+                  />
+              )}
+              {fill > 0 && (
+                  <Path
+                      d={circlePath}
+                      stroke={tintColorSecondary ? 'url(#gradient)' : tintColor}
+                      strokeWidth={width}
+                      strokeLinecap={fillLineCap}
+                      strokeDasharray={strokeDasharrayTint}
+                      fill="transparent"
+                  />
+              )}
+              {cap}
+            </G>
+          </Svg>
+          {children && <View style={localChildrenContainerStyle}>{children(fill)}</View>}
+        </View>
     );
   }
 }
 
 CircularProgress.propTypes = {
   style: PropTypes.object,
-  size: PropTypes.oneOfType([
-    PropTypes.number,
-    PropTypes.instanceOf(Animated.Value),
-  ]).isRequired,
+  size: PropTypes.oneOfType([PropTypes.number, PropTypes.instanceOf(Animated.Value)]).isRequired,
   fill: PropTypes.number.isRequired,
   width: PropTypes.number.isRequired,
   backgroundWidth: PropTypes.number,
   tintColor: PropTypes.string,
+  tintColorSecondary: PropTypes.string,
   tintTransparency: PropTypes.bool,
   backgroundColor: PropTypes.string,
+  backgroundColorSecondary: PropTypes.string,
   rotation: PropTypes.number,
   lineCap: PropTypes.string,
   arcSweepAngle: PropTypes.number,
@@ -151,7 +151,7 @@ CircularProgress.propTypes = {
   padding: PropTypes.number,
   renderCap: PropTypes.func,
   dashedBackground: PropTypes.object,
-  dashedTint: PropTypes.object
+  dashedTint: PropTypes.object,
 };
 
 CircularProgress.defaultProps = {

@@ -1,4 +1,4 @@
-declare module 'react-native-circular-progress' {
+declare module 'react-native-circular-progress-fixed-gradient-background' {
   import * as React from 'react';
   import {
     Animated,
@@ -49,7 +49,7 @@ declare module 'react-native-circular-progress' {
 
     /**
      * Change the fill color from tintColor to tintColorSecondary as animation progresses.
-     *
+     * also use for tiny linear gradient
      * @type {string}
      * @default 'undefined'
      */
@@ -69,6 +69,12 @@ declare module 'react-native-circular-progress' {
      * @type {string}
      */
     backgroundColor?: string;
+    /**
+     * Change the background color with linear gradient from backgroundColor to backgroundColorSecondary
+     * @type {string}
+     * @default 'undefined'
+     */
+    backgroundColorSecondary?:string
 
     /**
      * Angle from which the progress starts from

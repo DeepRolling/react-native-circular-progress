@@ -1,4 +1,15 @@
-# react-native-circular-progress
+# react-native-circular-progress-fixed-gradient-background
+
+
+Notice : 
+
+This project is base on official library [react-native-circular-progress](https://github.com/bartgryszko/react-native-circular-progress).
+
+Only for personal usage, have the following changes :
+
+1. Add "backgroundColorSecondary" prop to let circle background can be gradient.
+2. The background of circle and progress will be displayed with linear gradient 
+   if you passed "tintColorSecondary" or "backgroundColorSecondary"
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 [![Version](https://img.shields.io/npm/v/react-native-circular-progress.svg)](https://www.npmjs.com/package/react-native-circular-progress)
